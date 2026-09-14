@@ -1,42 +1,15 @@
 'use client';
 
 import { Row } from '@/types';
+import { formatTanggal, getHari } from '@/utils/date-utils';
 import { Trash2 } from 'lucide-react';
 
-const HARI_MAP: Record<number, string> = {
-  0: 'Minggu',
-  1: 'Senin',
-  2: 'Selasa',
-  3: 'Rabu',
-  4: 'Kamis',
-  5: 'Jumat',
-  6: 'Sabtu',
-};
-
-function getHari(dateStr: string): string {
-  if (!dateStr) return '';
-  // dateStr is ISO format YYYY-MM-DD from date input
-  const [year, month, day] = dateStr.split('-').map(Number);
-  const d = new Date(year, month - 1, day);
-  return HARI_MAP[d.getDay()] ?? '';
-}
-
-function formatTanggal(dateStr: string): string {
-  if (!dateStr) return '';
-  const MONTHS = [
-    'Januari','Februari','Maret','April','Mei','Juni',
-    'Juli','Agustus','September','Oktober','November','Desember',
-  ];
-  const [year, month, day] = dateStr.split('-').map(Number);
-  return `${day} ${MONTHS[month - 1]} ${year}`;
-}
-
 interface Props {
-  rows: Row[];
-  onChange: (rows: Row[]) => void;
+  readonly rows: readonly Row[];
+  readonly onChange: (rows: Row[]) => void;
 }
 
-export default function AttendanceTable({ rows, onChange }: Props) {
+export default function AttendanceTable({ rows, onChange }: Readonly<Props>) {
   const addRow = () => {
     const newRow: Row = {
       id: crypto.randomUUID(),
