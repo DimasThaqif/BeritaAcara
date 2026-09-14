@@ -1,57 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Header, Row, Signers, BeritaAcaraPayload } from '@/types';
-import AttendanceTable from './AttendanceTable';
-import PreviewModal from './PreviewModal';
+import { Header, Row, Signers } from '@/types';
+import AttendanceTable from './attendance-table';
+import PreviewModal from './preview-modal';
+import { useBeritaAcaraExport } from '@/hooks/use-berita-acara-export';
+import { buildPayload } from '@/services/berita-acara-service';
 import { FileText, FileDown, Eye, Loader2, Building2 } from 'lucide-react';
-
-const MONTHS = [
-  'Januari','Februari','Maret','April','Mei','Juni',
-  'Juli','Agustus','September','Oktober','November','Desember',
-];
-
-function formatTanggal(dateStr: string): string {
-  if (!dateStr) return '';
-  const [year, month, day] = dateStr.split('-').map(Number);
-  return `${day} ${MONTHS[month - 1]} ${year}`;
-}
-
-function buildPayload(header: Header, rows: Row[], signers: Signers): BeritaAcaraPayload {
-  return {
-    header,
-    rows: rows.map(({ id: _id, ...rest }) => ({
-      ...rest,
-      tanggal: formatTanggal(rest.tanggal),
-    })),
-    signers,
-  };
-}
-
-async function downloadFile(url: string, payload: BeritaAcaraPayload, filename: string) {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: 'Unknown error' }));
-    throw new Error(err.error ?? 'Server error');
-  }
-
-  const blob = await res.blob();
-  const objectUrl = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = objectUrl;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(objectUrl);
-}
-
-const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 
 const inputClass =
   'w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition';
@@ -85,10 +40,8 @@ export default function BeritaAcaraForm() {
     menyetujui_jabatan: '',
   });
 
-  const [loadingDocx, setLoadingDocx] = useState(false);
-  const [loadingPdf, setLoadingPdf]   = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const [error, setError]             = useState<string | null>(null);
+  const { loadingDocx, loadingPdf, error, clearError, handleExport } = useBeritaAcaraExport();
 
   const updateHeader = (key: keyof Header, value: string) => {
     setHeader((prev) => {
@@ -99,25 +52,6 @@ export default function BeritaAcaraForm() {
       }
       return next;
     });
-  };
-
-  const handleExport = async (type: 'docx' | 'pdf') => {
-    setError(null);
-    const payload = buildPayload(header, rows, signers);
-    const setSelf = type === 'docx' ? setLoadingDocx : setLoadingPdf;
-    const url     = `${API}/api/generate/${type}`;
-    const ext     = type === 'docx' ? 'docx' : 'pdf';
-    const safeName = (header.nama || 'BeritaAcara').replace(/\s+/g, '_');
-    const filename = `BeritaAcara_${safeName}.${ext}`;
-
-    setSelf(true);
-    try {
-      await downloadFile(url, payload, filename);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Terjadi kesalahan. Pastikan backend berjalan.');
-    } finally {
-      setSelf(false);
-    }
   };
 
   const payload = buildPayload(header, rows, signers);
@@ -134,7 +68,7 @@ export default function BeritaAcaraForm() {
       <div className="space-y-6">
 
         {/* ── Company Letterhead Badge ─────────────────────────────────── */}
-        <div className="flex items-start gap-4 p-5 rounded-xl bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg">
+        <div className="flex items-start gap-4 p-5 rounded-xl bg-linear-to-r from-blue-700 to-blue-900 text-white shadow-lg">
           <div className="mt-0.5 p-2 rounded-lg bg-white/20">
             <Building2 size={22} />
           </div>
@@ -230,14 +164,14 @@ export default function BeritaAcaraForm() {
           <div className="flex items-start gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
             <span className="text-red-500 mt-0.5">⚠</span>
             <span>{error}</span>
-            <button onClick={() => setError(null)} className="ml-auto text-red-400 hover:text-red-600">✕</button>
+            <button onClick={clearError} className="ml-auto text-red-400 hover:text-red-600">✕</button>
           </div>
         )}
 
         {/* ── Action Buttons ───────────────────────────────────────────── */}
         <div className="flex flex-wrap gap-3">
           <button
-            onClick={() => handleExport('docx')}
+            onClick={() => handleExport('docx', header, rows, signers)}
             disabled={loadingDocx}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold shadow-md hover:shadow-lg active:scale-95 transition-all"
           >
@@ -248,7 +182,7 @@ export default function BeritaAcaraForm() {
           </button>
 
           <button
-            onClick={() => handleExport('pdf')}
+            onClick={() => handleExport('pdf', header, rows, signers)}
             disabled={loadingPdf}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold shadow-md hover:shadow-lg active:scale-95 transition-all"
           >

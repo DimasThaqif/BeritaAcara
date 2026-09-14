@@ -1,9 +1,9 @@
-import BeritaAcaraForm from '@/components/BeritaAcaraForm';
+import BeritaAcaraForm from '@/components/berita-acara-form';
 import { FileSignature } from 'lucide-react';
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-100">
+    <main className="min-h-screen bg-linear-to-br from-slate-100 via-blue-50 to-slate-100">
 
       {/* Top nav bar */}
       <header className="sticky top-0 z-40 border-b border-white/60 bg-white/80 backdrop-blur-md shadow-sm">

@@ -1,25 +1,19 @@
 'use client';
 
 import { BeritaAcaraPayload, Row } from '@/types';
+import { formatTanggal } from '@/utils/date-utils';
 import { X } from 'lucide-react';
 
-const MONTHS = [
-  'Januari','Februari','Maret','April','Mei','Juni',
-  'Juli','Agustus','September','Oktober','November','Desember',
-];
-
-function formatTanggal(dateStr: string): string {
-  if (!dateStr) return '';
-  const [year, month, day] = dateStr.split('-').map(Number);
-  return `${day} ${MONTHS[month - 1]} ${year}`;
-}
-
 interface Props {
-  payload: { header: BeritaAcaraPayload['header']; signers: BeritaAcaraPayload['signers']; rows: Row[] };
-  onClose: () => void;
+  readonly payload: {
+    readonly header: BeritaAcaraPayload['header'];
+    readonly signers: BeritaAcaraPayload['signers'];
+    readonly rows: readonly Row[];
+  };
+  readonly onClose: () => void;
 }
 
-export default function PreviewModal({ payload, onClose }: Props) {
+export default function PreviewModal({ payload, onClose }: Readonly<Props>) {
   const { header, rows, signers } = payload;
 
   return (
