@@ -1,0 +1,27 @@
+# ── Go ─────────────────────────────────────────────
+backend/berita-acara-api
+backend/*.exe
+backend/tmp/
+
+# ── Node / Next.js ──────────────────────────────────
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.turbo/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# ── Environment ─────────────────────────────────────
+frontend/.env*.local
+
+# ── Test artifacts ───────────────────────────────────
+test_output.pdf
+test_output.docx
+test_payload.json
+
+# ── OS / Editor ─────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
