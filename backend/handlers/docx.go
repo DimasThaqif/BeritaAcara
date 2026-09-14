@@ -137,7 +137,7 @@ func kvRow(label, value string) string {
   <w:tc><w:tcPr><w:tcW w:w="%d" w:type="dxa"/><w:tcBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders></w:tcPr><w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>%s</w:t></w:r></w:p></w:tc>
   <w:tc><w:tcPr><w:tcW w:w="%d" w:type="dxa"/><w:tcBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders></w:tcPr><w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>:</w:t></w:r></w:p></w:tc>
   <w:tc><w:tcPr><w:tcW w:w="%d" w:type="dxa"/><w:tcBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders></w:tcPr><w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>%s</w:t></w:r></w:p></w:tc>
-</w:tr>`, labelTwips, colonTwips, valueTwips, esc(label), esc(value))
+</w:tr>`, labelTwips, esc(label), colonTwips, valueTwips, esc(value))
 }
 
 func tableCell(text, bold, align string, width int, borders bool) string {
@@ -292,7 +292,7 @@ func buildDocumentXML(payload models.BeritaAcara) string {
     <w:p><w:r><w:rPr><w:b/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>%s</w:t></w:r></w:p></w:tc>
   <w:tc><w:tcPr><w:tcW w:w="%d" w:type="dxa"/><w:tcBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders></w:tcPr>
     <w:p><w:r><w:rPr><w:b/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>%s</w:t></w:r></w:p></w:tc>
-</w:tr>`, colW, colW, esc(payload.Signers.Saksi), esc(payload.Signers.HormatSaya)))
+</w:tr>`, colW, esc(payload.Signers.Saksi), colW, esc(payload.Signers.HormatSaya)))
 
 	sb.WriteString(`</w:tbl>`)
 	sb.WriteString(para("", "left", 200))
