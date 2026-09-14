@@ -104,16 +104,16 @@ export default function PreviewModal({ payload, onClose }: Readonly<Props>) {
           <table className="w-full text-[12px] mb-6" style={{ borderCollapse: 'collapse' }}>
             <tbody>
               <tr>
-                <td className="w-1/2 align-top pb-1">Saksi</td>
-                <td className="w-1/2 align-top pb-1">Hormat Saya,</td>
+                <td className="w-1/2 align-top pb-1 text-center">Saksi</td>
+                <td className="w-1/2 align-top pb-1 text-center">Hormat Saya,</td>
               </tr>
               <tr>
                 <td className="h-16"></td>
                 <td className="h-16"></td>
               </tr>
               <tr>
-                <td className="font-bold pt-1">{signers.saksi}</td>
-                <td className="font-bold pt-1">{signers.hormat_saya}</td>
+                <td className="font-bold pt-1 text-center">{signers.saksi}</td>
+                <td className="font-bold pt-1 text-center">{signers.hormat_saya}</td>
               </tr>
             </tbody>
           </table>
