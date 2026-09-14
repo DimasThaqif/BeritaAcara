@@ -20,7 +20,8 @@ function formatTanggal(dateStr: string): string {
 function buildPayload(header: Header, rows: Row[], signers: Signers): BeritaAcaraPayload {
   return {
     header,
-    rows: rows.map(({ id: _id, ...rest }) => ({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    rows: rows.map(({ id, ...rest }) => ({
       ...rest,
       tanggal: formatTanggal(rest.tanggal),
     })),
