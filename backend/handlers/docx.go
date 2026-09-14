@@ -129,10 +129,10 @@ func run(text, bold, underline string, sz int) string {
 }
 
 func kvRow(label, value string) string {
-	// label cell ~35mm, colon cell ~5mm, value cell rest
-	labelTwips := twip(35)
-	colonTwips := twip(5)
-	valueTwips := twip(125)
+	// label cell ~32mm, colon cell ~4mm, value cell rest (total 160mm)
+	labelTwips := twip(32)
+	colonTwips := twip(4)
+	valueTwips := twip(124)
 	return fmt.Sprintf(`<w:tr>
   <w:tc><w:tcPr><w:tcW w:w="%d" w:type="dxa"/><w:tcBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders></w:tcPr><w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>%s</w:t></w:r></w:p></w:tc>
   <w:tc><w:tcPr><w:tcW w:w="%d" w:type="dxa"/><w:tcBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders></w:tcPr><w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>:</w:t></w:r></w:p></w:tc>
@@ -173,23 +173,23 @@ func buildDocumentXML(payload models.BeritaAcara) string {
             xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
 <w:body>
 <w:sectPr>
-  <w:pgSz w:w="12240" w:h="15840"/>
-  <w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="709" w:footer="709" w:gutter="0"/>
+  <w:pgSz w:w="11906" w:h="16838"/>
+  <w:pgMar w:top="1417" w:right="1417" w:bottom="1134" w:left="1417" w:header="709" w:footer="709" w:gutter="0"/>
 </w:sectPr>
 `)
 
 	// ── PT. BNI Header ──────────────────────────────────────────────────────
 	sb.WriteString(para(run("PT. BANK NEGARA INDONESIA (Persero) Tbk", "1", "", 22), "left", 40))
-	sb.WriteString(para(run("DIVISI RETAIL DIGITAL DELIVERY", "1", "", 22), "left", 200))
+	sb.WriteString(para(run("DIVISI RETAIL DIGITAL DELIVERY", "1", "", 22), "left", 160))
 
 	// ── Title ────────────────────────────────────────────────────────────────
-	sb.WriteString(para(run("BERITA ACARA", "1", "single", 26), "center", 200))
+	sb.WriteString(para(run("BERITA ACARA", "1", "single", 26), "center", 160))
 
 	// ── Intro ─────────────────────────────────────────────────────────────────
-	sb.WriteString(para(run("Yang bertandatangan di bawah ini menerangkan bahwa:", "", "", 20), "left", 80))
+	sb.WriteString(para(run("Yang bertandatangan di bawah ini menerangkan bahwa:", "", "", 20), "left", 60))
 
 	// ── KV Table (borderless) ────────────────────────────────────────────────
-	kvTableW := twip(165)
+	kvTableW := twip(160)
 	sb.WriteString(fmt.Sprintf(`<w:tbl>
 <w:tblPr>
   <w:tblW w:w="%d" w:type="dxa"/>
@@ -204,11 +204,10 @@ func buildDocumentXML(payload models.BeritaAcara) string {
 	sb.WriteString(kvRow("Departement", payload.Header.Departement))
 	sb.WriteString(kvRow("Kelompok", payload.Header.Kelompok))
 	sb.WriteString(`</w:tbl>`)
-	sb.WriteString(para("", "left", 80))
+	sb.WriteString(para("", "left", 120))
 
-	// ── Attendance Table ─────────────────────────────────────────────────────
-	// Column widths in twips (total ~9350 for ~165mm content)
-	cw := []int{1800, 1200, 1350, 1350, 3650}
+	// Attendance Table Column widths in twips for 160mm total
+	cw := []int{twip(28), twip(16), twip(23), twip(23), twip(70)}
 	totalW := 0
 	for _, w := range cw {
 		totalW += w
@@ -232,7 +231,7 @@ func buildDocumentXML(payload models.BeritaAcara) string {
 	sb.WriteString("<w:tr>")
 	for i, h := range headers {
 		sb.WriteString(fmt.Sprintf(`<w:tc>
-  <w:tcPr><w:tcW w:w="%d" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="DCDCDC"/><w:vAlign w:val="center"/></w:tcPr>
+  <w:tcPr><w:tcW w:w="%d" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F0F0F0"/><w:vAlign w:val="center"/></w:tcPr>
   <w:p>
     <w:pPr><w:jc w:val="center"/><w:spacing w:before="60" w:after="60"/></w:pPr>
     <w:r><w:rPr><w:b/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="18"/></w:rPr><w:t>%s</w:t></w:r>
@@ -253,7 +252,7 @@ func buildDocumentXML(payload models.BeritaAcara) string {
 	}
 
 	sb.WriteString(`</w:tbl>`)
-	sb.WriteString(para("", "left", 200))
+	sb.WriteString(para("", "left", 360))
 
 	// ── Signer block ─────────────────────────────────────────────────────────
 	signerTableW := totalW
@@ -269,29 +268,29 @@ func buildDocumentXML(payload models.BeritaAcara) string {
   </w:tblBorders>
 </w:tblPr>`, signerTableW))
 
-	// Labels row
+	// Labels row (Centered in each column)
 	sb.WriteString(fmt.Sprintf(`<w:tr>
   <w:tc><w:tcPr><w:tcW w:w="%d" w:type="dxa"/><w:tcBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders></w:tcPr>
-    <w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>Saksi</w:t></w:r></w:p></w:tc>
+    <w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>Saksi</w:t></w:r></w:p></w:tc>
   <w:tc><w:tcPr><w:tcW w:w="%d" w:type="dxa"/><w:tcBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders></w:tcPr>
-    <w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>Hormat Saya,</w:t></w:r></w:p></w:tc>
+    <w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>Hormat Saya,</w:t></w:r></w:p></w:tc>
 </w:tr>`, colW, colW))
 
 	// Signature space rows (3 empty rows)
 	for i := 0; i < 3; i++ {
 		sb.WriteString(fmt.Sprintf(`<w:tr>
-  <w:trPr><w:trHeight w:val="400"/></w:trPr>
+  <w:trPr><w:trHeight w:val="450"/></w:trPr>
   <w:tc><w:tcPr><w:tcW w:w="%d" w:type="dxa"/><w:tcBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders></w:tcPr><w:p/></w:tc>
   <w:tc><w:tcPr><w:tcW w:w="%d" w:type="dxa"/><w:tcBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders></w:tcPr><w:p/></w:tc>
 </w:tr>`, colW, colW))
 	}
 
-	// Names row
+	// Names row (Bold, Centered)
 	sb.WriteString(fmt.Sprintf(`<w:tr>
   <w:tc><w:tcPr><w:tcW w:w="%d" w:type="dxa"/><w:tcBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders></w:tcPr>
-    <w:p><w:r><w:rPr><w:b/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>%s</w:t></w:r></w:p></w:tc>
+    <w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>%s</w:t></w:r></w:p></w:tc>
   <w:tc><w:tcPr><w:tcW w:w="%d" w:type="dxa"/><w:tcBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders></w:tcPr>
-    <w:p><w:r><w:rPr><w:b/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>%s</w:t></w:r></w:p></w:tc>
+    <w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>%s</w:t></w:r></w:p></w:tc>
 </w:tr>`, colW, esc(payload.Signers.Saksi), colW, esc(payload.Signers.HormatSaya)))
 
 	sb.WriteString(`</w:tbl>`)
@@ -302,7 +301,6 @@ func buildDocumentXML(payload models.BeritaAcara) string {
 
 	// Signature space
 	for i := 0; i < 3; i++ {
-		sb.WriteString(para("", "center", 0))
 		sb.WriteString(para("", "center", 0))
 	}
 
